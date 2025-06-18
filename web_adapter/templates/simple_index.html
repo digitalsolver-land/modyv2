@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moody - Suivi de l'humeur</title>
+    <link rel="stylesheet" href="{{ url_for('serve_static', path='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-background"></div>
+    <div class="auth-container">
+        <div class="logo-container">
+            <img src="{{ url_for('serve_static', path='images/logo.jpg') }}" alt="Moody Logo" class="app-logo">
+        </div>
+        <h2 class="auth-subtitle">Application de suivi d'humeur quotidienne</h2>
+        
+        <div class="tabs">
+            <button class="tab-btn active" id="login-tab">
+                <i class="fas fa-sign-in-alt"></i>
+                Se connecter
+            </button>
+            <button class="tab-btn" id="register-tab">
+                <i class="fas fa-user-plus"></i>
+                Créer un compte
+            </button>
+        </div>
+        
+        <!-- Login Form -->
+        <div class="auth-form" id="login-form">
+            <div class="form-group">
+                <label for="username">
+                    <i class="fas fa-user"></i>
+                    Nom d'utilisateur
+                </label>
+                <div class="input-group">
+                    <input type="text" 
+                           id="username" 
+                           placeholder="Votre nom d'utilisateur"
+                           autocomplete="username">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-lock"></i>
+                    Mot de passe
+                </label>
+                <div class="input-group">
+                    <input type="password" 
+                           id="password" 
+                           placeholder="Votre mot de passe"
+                           autocomplete="current-password">
+                    <button type="button" 
+                            class="toggle-password"
+                            onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <button class="primary-btn" id="login-button">
+                <i class="fas fa-spinner fa-spin" style="display: none;"></i>
+                <span>
+                    <i class="fas fa-sign-in-alt"></i>
+                    Se connecter
+                </span>
+            </button>
+            <div class="error-message" id="login-error"></div>
+        </div>
+        
+        <!-- Registration Form -->
+        <div class="auth-form" id="register-form" style="display: none;">
+            <div class="form-group">
+                <label for="reg-username">
+                    <i class="fas fa-user"></i>
+                    Nom d'utilisateur
+                </label>
+                <div class="input-group">
+                    <input type="text" 
+                           id="reg-username" 
+                           placeholder="Choisir un nom d'utilisateur"
+                           autocomplete="username">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reg-email">
+                    <i class="fas fa-envelope"></i>
+                    Email
+                </label>
+                <div class="input-group">
+                    <input type="email" 
+                           id="reg-email" 
+                           placeholder="Votre email"
+                           autocomplete="email">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reg-password">
+                    <i class="fas fa-lock"></i>
+                    Mot de passe
+                </label>
+                <div class="input-group">
+                    <input type="password" 
+                           id="reg-password" 
+                           placeholder="Choisir un mot de passe"
+                           autocomplete="new-password">
+                    <button type="button" 
+                            class="toggle-password"
+                            onclick="togglePassword('reg-password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reg-confirm">
+                    <i class="fas fa-lock"></i>
+                    Confirmer le mot de passe
+                </label>
+                <div class="input-group">
+                    <input type="password" 
+                           id="reg-confirm" 
+                           placeholder="Confirmer votre mot de passe"
+                           autocomplete="new-password">
+                    <button type="button" 
+                            class="toggle-password"
+                            onclick="togglePassword('reg-confirm')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-venus-mars"></i>
+                    Genre
+                </label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="M" checked>
+                        <i class="fas fa-mars"></i>
+                        Homme
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="gender" value="F">
+                        <i class="fas fa-venus"></i>
+                        Femme
+                    </label>
+                </div>
+            </div>
+            <div class="form-group" id="menstrual-date-group" style="display: none;">
+                <label for="menstrual-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    Date des dernières règles
+                </label>
+                <div class="input-group">
+                    <input type="date" id="menstrual-date">
+                </div>
+            </div>
+            <button class="primary-btn" id="register-button">
+                <i class="fas fa-spinner fa-spin" style="display: none;"></i>
+                <span>
+                    <i class="fas fa-user-plus"></i>
+                    Créer un compte
+                </span>
+            </button>
+            <div class="error-message" id="register-error"></div>
+        </div>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            Bienvenue dans l'application Moody pour le suivi de votre humeur quotidienne.
+        </p>
+    </div>
+    
+    <script>
+        // Fonction pour basculer la visibilité du mot de passe
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.parentElement.querySelector('.toggle-password');
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Gestion des onglets
+        document.getElementById('login-tab').addEventListener('click', function() {
+            document.getElementById('login-tab').classList.add('active');
+            document.getElementById('register-tab').classList.remove('active');
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+        });
+        
+        document.getElementById('register-tab').addEventListener('click', function() {
+            document.getElementById('register-tab').classList.add('active');
+            document.getElementById('login-tab').classList.remove('active');
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('login-form').style.display = 'none';
+        });
+        
+        // Gestion du champ de date des règles en fonction du genre
+        document.querySelectorAll('input[name="gender"]').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                const menstrualDateGroup = document.getElementById('menstrual-date-group');
+                if (this.value === 'F') {
+                    menstrualDateGroup.style.display = 'block';
+                } else {
+                    menstrualDateGroup.style.display = 'none';
+                }
+            });
+        });
+        
+        // Fonction pour afficher/masquer le spinner de chargement
+        function toggleSpinner(button, show) {
+            const spinner = button.querySelector('.fa-spinner');
+            const content = button.querySelector('span');
+            if (show) {
+                spinner.style.display = 'inline-block';
+                content.style.display = 'none';
+                button.disabled = true;
+            } else {
+                spinner.style.display = 'none';
+                content.style.display = 'inline-block';
+                button.disabled = false;
+            }
+        }
+
+        // Gestion de la soumission du formulaire de connexion
+        document.getElementById('login-button').addEventListener('click', function() {
+            const button = this;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+            
+            if (!username || !password) {
+                errorDiv.textContent = 'Veuillez remplir tous les champs';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Afficher le spinner
+            toggleSpinner(button, true);
+            errorDiv.style.display = 'none';
+            
+            // Envoyer la requête de connexion
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Rediriger vers le tableau de bord
+                    window.location.href = data.redirect || '/dashboard';
+                } else {
+                    errorDiv.textContent = data.message || 'Erreur de connexion';
+                    errorDiv.style.display = 'block';
+                    toggleSpinner(button, false);
+                }
+            })
+            .catch(error => {
+                errorDiv.textContent = 'Erreur de connexion au serveur';
+                errorDiv.style.display = 'block';
+                toggleSpinner(button, false);
+                console.error('Error:', error);
+            });
+        });
+        
+        // Registration form submission
+        document.getElementById('register-button').addEventListener('click', function() {
+            const button = this;
+            const username = document.getElementById('reg-username').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm').value;
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const menstrualDate = gender === 'F' ? document.getElementById('menstrual-date').value : null;
+            const errorDiv = document.getElementById('register-error');
+            
+            // Validation des champs
+            if (!username || !email || !password || !confirmPassword) {
+                errorDiv.textContent = 'Veuillez remplir tous les champs';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Les mots de passe ne correspondent pas';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorDiv.textContent = 'Le mot de passe doit comporter au moins 6 caractères';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (gender === 'F' && !menstrualDate) {
+                errorDiv.textContent = 'Veuillez entrer la date de vos dernières règles';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Afficher le spinner
+            toggleSpinner(button, true);
+            errorDiv.style.display = 'none';
+            
+            // Envoyer la requête d'inscription
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    username, 
+                    email, 
+                    password, 
+                    gender, 
+                    menstrual_date: menstrualDate 
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Rediriger vers le tableau de bord
+                    window.location.href = data.redirect || '/dashboard';
+                } else {
+                    errorDiv.textContent = data.message || 'Erreur d\'inscription';
+                    errorDiv.style.display = 'block';
+                    toggleSpinner(button, false);
+                }
+            })
+            .catch(error => {
+                errorDiv.textContent = 'Erreur de connexion au serveur';
+                errorDiv.style.display = 'block';
+                toggleSpinner(button, false);
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
