@@ -840,35 +840,39 @@
             // Configuration
             const pageWidth = 210;
             const pageHeight = 297;
-            const margin = 20;
+            const margin = 15;
             const contentWidth = pageWidth - (margin * 2);
             
             // Titre principal
-            pdf.setFontSize(20);
+            pdf.setFontSize(22);
             pdf.setFont('helvetica', 'bold');
-            pdf.text('Analyse de votre humeur - MOODY', margin, margin + 10);
+            pdf.setTextColor(76, 175, 80);
+            pdf.text('Analyse de votre humeur - MOODY', margin, margin + 12);
             
             // Date de génération
-            pdf.setFontSize(12);
+            pdf.setFontSize(11);
             pdf.setFont('helvetica', 'normal');
+            pdf.setTextColor(0, 0, 0);
             const today = new Date().toLocaleDateString('fr-FR');
-            pdf.text(`Rapport généré le ${today}`, margin, margin + 20);
+            pdf.text(`Rapport généré le ${today}`, margin, margin + 25);
             
             // Période analysée
             const period = document.getElementById('date-range').selectedOptions[0].text;
-            pdf.text(`Période: ${period}`, margin, margin + 30);
+            pdf.text(`Période: ${period}`, margin, margin + 35);
             
-            let currentY = margin + 50;
+            let currentY = margin + 55;
             
             // Statistiques générales
             pdf.setFontSize(16);
             pdf.setFont('helvetica', 'bold');
-            pdf.text('Statistiques générales', margin, currentY);
-            currentY += 15;
+            pdf.setTextColor(76, 175, 80);
+            pdf.text('📊 Statistiques générales', margin, currentY);
+            currentY += 12;
             
             if (moodEntries.length > 0) {
-                pdf.setFontSize(12);
+                pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0);
                 
                 const emojiValues = {
                     'very_happy': 5, 'happy': 4, 'neutral': 3, 'sad': 2, 'very_sad': 1,
@@ -887,24 +891,25 @@
                 }
                 
                 const stats = [
-                    `Nombre d'entrées: ${moodEntries.length}`,
-                    `Humeur moyenne: ${getMoodLabel(avgMood)}`,
-                    `Première entrée: ${new Date(moodEntries[0]?.date).toLocaleDateString('fr-FR')}`,
-                    `Dernière entrée: ${new Date(moodEntries[moodEntries.length-1]?.date).toLocaleDateString('fr-FR')}`
+                    `• Nombre d'entrées: ${moodEntries.length}`,
+                    `• Humeur moyenne: ${getMoodLabel(avgMood)}`,
+                    `• Première entrée: ${new Date(moodEntries[0]?.date).toLocaleDateString('fr-FR')}`,
+                    `• Dernière entrée: ${new Date(moodEntries[moodEntries.length-1]?.date).toLocaleDateString('fr-FR')}`
                 ];
                 
                 stats.forEach(stat => {
-                    pdf.text(`• ${stat}`, margin + 5, currentY);
-                    currentY += 8;
+                    pdf.text(stat, margin + 3, currentY);
+                    currentY += 7;
                 });
                 
-                currentY += 15;
+                currentY += 10;
                 
                 // Distribution des émojis
                 pdf.setFontSize(16);
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('Distribution des émotions', margin, currentY);
-                currentY += 15;
+                pdf.setTextColor(76, 175, 80);
+                pdf.text('😊 Distribution des émotions', margin, currentY);
+                currentY += 12;
                 
                 const emojiCounts = {};
                 moodEntries.forEach(entry => {
@@ -922,22 +927,24 @@
                     'anxious': 'Anxieux(se)'
                 };
                 
-                pdf.setFontSize(12);
+                pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0);
                 
                 Object.entries(emojiCounts).forEach(([emoji, count]) => {
                     const percentage = Math.round((count / moodEntries.length) * 100);
-                    pdf.text(`• ${emojiLabels[emoji] || emoji}: ${count} fois (${percentage}%)`, margin + 5, currentY);
-                    currentY += 8;
+                    pdf.text(`• ${emojiLabels[emoji] || emoji}: ${count} fois (${percentage}%)`, margin + 3, currentY);
+                    currentY += 7;
                 });
                 
-                currentY += 15;
+                currentY += 10;
                 
                 // Moyennes des questions
                 pdf.setFontSize(16);
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('Moyennes des évaluations', margin, currentY);
-                currentY += 15;
+                pdf.setTextColor(76, 175, 80);
+                pdf.text('📈 Moyennes des évaluations', margin, currentY);
+                currentY += 12;
                 
                 let q1Total = 0, q2Total = 0, q3Total = 0;
                 moodEntries.forEach(entry => {
@@ -951,68 +958,187 @@
                 const q2Avg = count > 0 ? (q2Total / count).toFixed(1) : 0;
                 const q3Avg = count > 0 ? (q3Total / count).toFixed(1) : 0;
                 
-                pdf.setFontSize(12);
+                pdf.setFontSize(11);
                 pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0);
                 
                 const questionStats = [
-                    `Niveau d'énergie: ${q1Avg}/3`,
-                    `Niveau de stress: ${q2Avg}/3`,
-                    `Satisfaction de la journée: ${q3Avg}/3`
+                    `• Niveau d'énergie: ${q1Avg}/3`,
+                    `• Niveau de stress: ${q2Avg}/3`,
+                    `• Satisfaction de la journée: ${q3Avg}/3`
                 ];
                 
                 questionStats.forEach(stat => {
-                    pdf.text(`• ${stat}`, margin + 5, currentY);
-                    currentY += 8;
+                    pdf.text(stat, margin + 3, currentY);
+                    currentY += 7;
                 });
                 
-                // Nouvelle page pour les graphiques si nécessaire
-                if (currentY > pageHeight - 60) {
-                    pdf.addPage();
-                    currentY = margin + 20;
-                }
+                // Nouvelle page pour les graphiques
+                pdf.addPage();
+                currentY = margin + 20;
                 
-                // Capture des graphiques
-                currentY += 20;
-                pdf.setFontSize(16);
+                // Capture des graphiques avec amélioration de la qualité
+                pdf.setFontSize(18);
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('Graphiques', margin, currentY);
-                currentY += 15;
+                pdf.setTextColor(76, 175, 80);
+                pdf.text('📊 Graphiques détaillés', margin, currentY);
+                currentY += 20;
                 
                 try {
-                    // Capturer le graphique d'évolution
+                    // Fonction pour améliorer la qualité des graphiques
+                    function enhanceCanvasForPDF(canvas) {
+                        // Créer un nouveau canvas avec une résolution plus élevée
+                        const tempCanvas = document.createElement('canvas');
+                        const tempCtx = tempCanvas.getContext('2d');
+                        
+                        // Doubler la résolution
+                        tempCanvas.width = canvas.width * 2;
+                        tempCanvas.height = canvas.height * 2;
+                        
+                        // Améliorer la qualité
+                        tempCtx.imageSmoothingEnabled = true;
+                        tempCtx.imageSmoothingQuality = 'high';
+                        
+                        // Dessiner le canvas original avec une meilleure qualité
+                        tempCtx.scale(2, 2);
+                        tempCtx.drawImage(canvas, 0, 0);
+                        
+                        return tempCanvas.toDataURL('image/png', 1.0);
+                    }
+                    
+                    // Capturer le graphique d'évolution avec titre
                     const timelineCanvas = document.getElementById('mood-timeline-chart');
-                    if (timelineCanvas) {
-                        const timelineImage = timelineCanvas.toDataURL('image/png');
-                        pdf.addImage(timelineImage, 'PNG', margin, currentY, contentWidth, 60);
-                        currentY += 70;
+                    if (timelineCanvas && charts.timeline) {
+                        pdf.setFontSize(14);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(0, 0, 0);
+                        pdf.text('Évolution de votre humeur dans le temps', margin, currentY);
+                        currentY += 15;
+                        
+                        const timelineImage = enhanceCanvasForPDF(timelineCanvas);
+                        pdf.addImage(timelineImage, 'PNG', margin, currentY, contentWidth, 85);
+                        currentY += 100;
                     }
                     
                     // Vérifier si on a besoin d'une nouvelle page
-                    if (currentY > pageHeight - 100) {
+                    if (currentY > pageHeight - 120) {
                         pdf.addPage();
                         currentY = margin + 20;
                     }
                     
-                    // Capturer les autres graphiques côte à côte
+                    // Capturer le graphique de distribution
                     const distributionCanvas = document.getElementById('emoji-distribution-chart');
-                    const questionsCanvas = document.getElementById('questions-avg-chart');
-                    
-                    if (distributionCanvas && questionsCanvas) {
-                        const distributionImage = distributionCanvas.toDataURL('image/png');
-                        const questionsImage = questionsCanvas.toDataURL('image/png');
+                    if (distributionCanvas && charts.distribution) {
+                        pdf.setFontSize(14);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(0, 0, 0);
+                        pdf.text('Distribution des émotions', margin, currentY);
+                        currentY += 15;
                         
-                        const chartWidth = (contentWidth - 10) / 2;
-                        pdf.addImage(distributionImage, 'PNG', margin, currentY, chartWidth, 60);
-                        pdf.addImage(questionsImage, 'PNG', margin + chartWidth + 10, currentY, chartWidth, 60);
+                        const distributionImage = enhanceCanvasForPDF(distributionCanvas);
+                        const chartWidth = contentWidth * 0.75;
+                        const chartHeight = 75;
+                        const xOffset = (contentWidth - chartWidth) / 2;
+                        
+                        pdf.addImage(distributionImage, 'PNG', margin + xOffset, currentY, chartWidth, chartHeight);
+                        currentY += 90;
                     }
+                    
+                    // Vérifier si on a besoin d'une nouvelle page
+                    if (currentY > pageHeight - 120) {
+                        pdf.addPage();
+                        currentY = margin + 20;
+                    }
+                    
+                    // Capturer le graphique des questions
+                    const questionsCanvas = document.getElementById('questions-avg-chart');
+                    if (questionsCanvas && charts.questions) {
+                        pdf.setFontSize(14);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(0, 0, 0);
+                        pdf.text('Moyennes des réponses aux questions', margin, currentY);
+                        currentY += 15;
+                        
+                        const questionsImage = enhanceCanvasForPDF(questionsCanvas);
+                        const chartWidth = contentWidth * 0.75;
+                        const chartHeight = 75;
+                        const xOffset = (contentWidth - chartWidth) / 2;
+                        
+                        pdf.addImage(questionsImage, 'PNG', margin + xOffset, currentY, chartWidth, chartHeight);
+                        currentY += 90;
+                    }
+                    
+                    // Capturer le graphique du cycle menstruel si applicable
+                    const cycleCanvas = document.getElementById('cycle-correlation-chart');
+                    if (cycleCanvas && charts.cycle && userGender === 'F') {
+                        // Vérifier si on a besoin d'une nouvelle page
+                        if (currentY > pageHeight - 120) {
+                            pdf.addPage();
+                            currentY = margin + 20;
+                        }
+                        
+                        pdf.setFontSize(14);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setTextColor(255, 105, 180);
+                        pdf.text('Corrélation avec le cycle menstruel', margin, currentY);
+                        currentY += 15;
+                        
+                        const cycleImage = enhanceCanvasForPDF(cycleCanvas);
+                        pdf.addImage(cycleImage, 'PNG', margin, currentY, contentWidth, 85);
+                    }
+                    
                 } catch (error) {
                     console.error('Erreur lors de la capture des graphiques:', error);
                     pdf.setFontSize(12);
-                    pdf.text('Erreur lors de la génération des graphiques', margin, currentY);
+                    pdf.setTextColor(255, 0, 0);
+                    pdf.text('❌ Erreur lors de la génération des graphiques', margin, currentY);
                 }
                 
+                // Ajouter une page de conclusion
+                pdf.addPage();
+                currentY = margin + 30;
+                
+                pdf.setFontSize(18);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(76, 175, 80);
+                pdf.text('💡 Conclusion et conseils', margin, currentY);
+                currentY += 20;
+                
+                pdf.setFontSize(12);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(0, 0, 0);
+                
+                const conclusions = [
+                    'Ce rapport vous donne un aperçu détaillé de votre humeur sur la période sélectionnée.',
+                    '',
+                    'Conseils pour améliorer votre bien-être :',
+                    '• Continuez à enregistrer votre humeur quotidiennement',
+                    '• Identifiez les patterns dans vos émotions',
+                    '• Consultez nos suggestions personnalisées',
+                    '• N\'hésitez pas à consulter un professionnel si nécessaire',
+                    '',
+                    'L\'application MOODY vous accompagne dans votre bien-être émotionnel.',
+                    'Prenez soin de vous ! 💚'
+                ];
+                
+                conclusions.forEach(line => {
+                    if (line === '') {
+                        currentY += 5;
+                    } else {
+                        const lines = pdf.splitTextToSize(line, contentWidth);
+                        pdf.text(lines, margin, currentY);
+                        currentY += lines.length * 6;
+                    }
+                });
+                
             } else {
-                pdf.text('Aucune donnée disponible pour la période sélectionnée.', margin, currentY);
+                pdf.setFontSize(14);
+                pdf.setTextColor(255, 140, 0);
+                pdf.text('⚠️ Aucune donnée disponible pour la période sélectionnée.', margin, currentY);
+                currentY += 20;
+                pdf.setFontSize(12);
+                pdf.setTextColor(0, 0, 0);
+                pdf.text('Commencez à enregistrer votre humeur pour voir apparaître des analyses détaillées.', margin, currentY);
             }
             
             // Télécharger le PDF
